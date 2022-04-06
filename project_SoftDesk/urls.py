@@ -21,14 +21,18 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from tickets_app.api_views import ProjectViewset, TicketViewset
-
+from tickets_app.api_views import (
+    ProjectViewset,
+    TicketViewset,
+    UserViewSet,
+)
 
 router = routers.SimpleRouter()
 
 router.register(
     prefix='projects', viewset=ProjectViewset, basename='projects'),
 router.register('tickets', TicketViewset, 'tickets'),
+router.register('users', UserViewSet, 'users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

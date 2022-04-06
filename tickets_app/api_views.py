@@ -1,12 +1,47 @@
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.viewsets import (
+    ModelViewSet,
+    )
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated,)
+from rest_framework import permissions
+from django.contrib.auth import get_user_model
 
 from tickets_app.models import Project, Ticket
-from tickets_app.serializers import ProjectSerializer, TicketSerializer
+from tickets_app.serializers import (
+    ProjectSerializer,
+    TicketSerializer,
+    UserSerializer,
+    )
 from .permissions import (
     IsContributor,
     IsAuthor,
+    IsHimself,
 )
+
+User = get_user_model()
+
+
+class UserViewSet(ModelViewSet):
+    serializer_class = UserSerializer
+    # permission_classes = (IsHimself,)
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        return queryset
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action in ('destroy', 'update', 'partial_update'):
+            permission_classes = [IsHimself, ]
+        else:
+            if self.action in ('list', 'retrieve',):
+                permission_classes = [IsAuthenticatedOrReadOnly, ]
+            else:
+                permission_classes = []
+        return [permission() for permission in permission_classes]
 
 
 class ProjectViewset(ModelViewSet):
