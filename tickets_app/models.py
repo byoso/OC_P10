@@ -15,6 +15,8 @@ class Project(models.Model):
     author = models.ForeignKey(
         "authentication.User",
         on_delete=models.CASCADE, null=True)
+    contributors = models.ManyToManyField(
+        "authentication.User", related_name="projects")
 
     def __repr__(self):
         return f"<{self.title}>"

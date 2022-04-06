@@ -1,12 +1,22 @@
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from tickets_app.models import Project, Ticket
 from tickets_app.serializers import ProjectSerializer, TicketSerializer
+from .permissions import (
+    IsContributor,
+    IsAuthor,
+)
 
 
-class ProjectViewset(ReadOnlyModelViewSet):
+class ProjectViewset(ModelViewSet):
 
     serializer_class = ProjectSerializer
+    permission_classes = (
+        IsAuthenticatedOrReadOnly,
+        IsContributor,
+        IsAuthor,
+        )
 
     def get_queryset(self):
         queryset = Project.objects.all()
