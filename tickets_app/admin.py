@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import Ticket, Projects
+from .models import Issues, Projects
 
 
-class TicketAdmin(admin.ModelAdmin):
+class IssuesAdmin(admin.ModelAdmin):
     list_display = ('title', 'project', 'referent')
 
 
@@ -10,5 +10,5 @@ class ProjectsAdmin(admin.ModelAdmin):
     list_display = ('title', 'author',)
 
 
-admin.site.register(Ticket, TicketAdmin)
+admin.site.register(Issues, IssuesAdmin)
 admin.site.register(Projects, ProjectsAdmin)

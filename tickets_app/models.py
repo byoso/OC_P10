@@ -25,7 +25,7 @@ class Projects(models.Model):
         return self.title
 
 
-class Ticket(models.Model):
+class Issues(models.Model):
     title = models.CharField(max_length=80)
     description = models.CharField(max_length=255)
     project = models.ForeignKey(

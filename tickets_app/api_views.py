@@ -7,10 +7,10 @@ from rest_framework.permissions import (
 from rest_framework import permissions
 from django.contrib.auth import get_user_model
 
-from tickets_app.models import Projects, Ticket
+from tickets_app.models import Projects, Issues
 from tickets_app.serializers import (
     ProjectsSerializer,
-    TicketSerializer,
+    IssuesSerializer,
     UserSerializer,
     )
 from .permissions import (
@@ -58,12 +58,12 @@ class ProjectsViewset(ModelViewSet):
         return queryset
 
 
-class TicketViewset(ModelViewSet):
+class IssuesViewset(ModelViewSet):
 
-    serializer_class = TicketSerializer
+    serializer_class = IssuesSerializer
 
     def get_queryset(self):
-        queryset = Ticket.objects.all()
+        queryset = Issues.objects.all()
         project_id = self.request.GET.get('project_id')
         if project_id is not None:
             queryset = queryset.filter(project_id=project_id)
