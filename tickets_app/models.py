@@ -2,7 +2,7 @@ from django.db import models
 # from django.contrib.auth import get_user_model
 
 
-class Project(models.Model):
+class Projects(models.Model):
     TYPE_CHOICES = [
         ("FE", "FRONT-END"),
         ("BE", "BACK-END"),
@@ -16,7 +16,7 @@ class Project(models.Model):
         "authentication.User",
         on_delete=models.CASCADE, null=True)
     contributors = models.ManyToManyField(
-        "authentication.User", related_name="projects")
+        "authentication.User", related_name="contributing")
 
     def __repr__(self):
         return f"<{self.title}>"
@@ -29,7 +29,7 @@ class Ticket(models.Model):
     title = models.CharField(max_length=80)
     description = models.CharField(max_length=255)
     project = models.ForeignKey(
-        "tickets_app.Project",
+        "tickets_app.Projects",
         on_delete=models.CASCADE,
         related_name="tickets"
         )

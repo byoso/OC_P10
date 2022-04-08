@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.serializers import ModelSerializer
 
 
-from tickets_app.models import Project, Ticket
+from tickets_app.models import Projects, Ticket
 
 User = get_user_model()
 
@@ -22,10 +22,10 @@ class UserSerializer(ModelSerializer):
         return user
 
 
-class ProjectSerializer(ModelSerializer):
+class ProjectsSerializer(ModelSerializer):
 
     class Meta:
-        model = Project
+        model = Projects
         fields = ['id', 'title', 'author', 'description', 'tickets']
 
 

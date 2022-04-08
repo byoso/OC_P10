@@ -7,9 +7,9 @@ from rest_framework.permissions import (
 from rest_framework import permissions
 from django.contrib.auth import get_user_model
 
-from tickets_app.models import Project, Ticket
+from tickets_app.models import Projects, Ticket
 from tickets_app.serializers import (
-    ProjectSerializer,
+    ProjectsSerializer,
     TicketSerializer,
     UserSerializer,
     )
@@ -44,9 +44,9 @@ class UserViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class ProjectViewset(ModelViewSet):
+class ProjectsViewset(ModelViewSet):
 
-    serializer_class = ProjectSerializer
+    serializer_class = ProjectsSerializer
     permission_classes = (
         IsAuthenticatedOrReadOnly,
         IsContributor,
@@ -54,7 +54,7 @@ class ProjectViewset(ModelViewSet):
         )
 
     def get_queryset(self):
-        queryset = Project.objects.all()
+        queryset = Projects.objects.all()
         return queryset
 
 

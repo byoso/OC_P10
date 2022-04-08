@@ -22,7 +22,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from tickets_app.api_views import (
-    ProjectViewset,
+    ProjectsViewset,
     TicketViewset,
     UserViewSet,
 )
@@ -30,7 +30,7 @@ from tickets_app.api_views import (
 router = routers.SimpleRouter()
 
 router.register(
-    prefix='projects', viewset=ProjectViewset, basename='projects'),
+    prefix='projects', viewset=ProjectsViewset, basename='projects'),
 router.register('tickets', TicketViewset, 'tickets'),
 router.register('users', UserViewSet, 'users')
 
