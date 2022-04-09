@@ -1,14 +1,14 @@
 from django.contrib import admin
-from .models import Issues, Projects
+from .models import Issue, Project
 
 
-class IssuesAdmin(admin.ModelAdmin):
+class IssueAdmin(admin.ModelAdmin):
     list_display = ('title', 'project', 'referent')
 
 
-class ProjectsAdmin(admin.ModelAdmin):
+class ProjectAdmin(admin.ModelAdmin):
     list_display = ('title', 'author',)
 
 
-admin.site.register(Issues, IssuesAdmin)
-admin.site.register(Projects, ProjectsAdmin)
+admin.site.register(Issue, IssueAdmin)
+admin.site.register(Project, ProjectAdmin)
