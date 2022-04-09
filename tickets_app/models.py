@@ -1,6 +1,12 @@
 from django.db import models
 # from django.contrib.auth import get_user_model
 
+# User = get_user_model()
+
+
+class Contributor(models.Model):
+    pass
+
 
 class Project(models.Model):
     TYPE_CHOICES = [
@@ -27,17 +33,35 @@ class Project(models.Model):
 
 class Issue(models.Model):
     title = models.CharField(max_length=80)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, null=True)
+    tag = models.CharField(max_length=16, null=True)
+    priority = models.CharField(max_length=16, null=True)
     project = models.ForeignKey(
         "tickets_app.Project",
         on_delete=models.CASCADE,
         related_name="issues"
         )
-    referent = models.ForeignKey(
-        "authentication.User", on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(
+        "authentication.User",
+        on_delete=models.CASCADE,
+        null=True, related_name="written_issues")
+    assignee = models.ForeignKey(
+        "authentication.User", on_delete=models.CASCADE, null=True, related_name="assignee_to_issues")
+    created_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __repr__(self):
         return f"<{self.title}>"
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    description = models.CharField(max_length=255)
+    author = models.ForeignKey(
+        'authentication.User',
+        on_delete=models.CASCADE, related_name='comments')
+    issue = models.ForeignKey(
+        'tickets_app.Issue',
+        on_delete=models.CASCADE, related_name='comments')
+    created_time = models.DateTimeField(auto_now_add=True, null=True)

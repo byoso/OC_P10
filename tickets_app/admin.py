@@ -3,7 +3,7 @@ from .models import Issue, Project
 
 
 class IssueAdmin(admin.ModelAdmin):
-    list_display = ('title', 'project', 'referent')
+    list_display = ('title', 'project', 'assignee')
 
 
 class ProjectAdmin(admin.ModelAdmin):
