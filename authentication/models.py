@@ -7,4 +7,3 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=80, blank=True, null=True)
     # FK 'tickets' to tickets_app Ticket
     # FK 'projectss' to tickets_app Project
-    pass

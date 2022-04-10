@@ -1,11 +1,6 @@
 from django.db import models
-# from django.contrib.auth import get_user_model
+from django.conf import settings
 
-# User = get_user_model()
-
-
-class Contributor(models.Model):
-    pass
 
 
 class Project(models.Model):
@@ -19,10 +14,12 @@ class Project(models.Model):
     description = models.CharField(max_length=255)
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)
     author = models.ForeignKey(
-        "authentication.User",
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE, null=True)
     contributors = models.ManyToManyField(
-        "authentication.User", related_name="contributing")
+        settings.AUTH_USER_MODEL, through='Contributor',
+        related_name="contributing",
+        )
 
     def __repr__(self):
         return f"<{self.title}>"
@@ -42,11 +39,12 @@ class Issue(models.Model):
         related_name="issues"
         )
     author = models.ForeignKey(
-        "authentication.User",
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         null=True, related_name="written_issues")
     assignee = models.ForeignKey(
-        "authentication.User", on_delete=models.CASCADE, null=True, related_name="assignee_to_issues")
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True,
+        related_name="assignee_to_issues")
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __repr__(self):
@@ -59,9 +57,23 @@ class Issue(models.Model):
 class Comment(models.Model):
     description = models.CharField(max_length=255)
     author = models.ForeignKey(
-        'authentication.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE, related_name='comments')
     issue = models.ForeignKey(
         'tickets_app.Issue',
         on_delete=models.CASCADE, related_name='comments')
     created_time = models.DateTimeField(auto_now_add=True, null=True)
+
+
+class Contributor(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name='contributing_users', null=True)
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name='projects',
+        null=True)
+    # TODO: permission (choicefield)
+    role = models.CharField(max_length=80, null=True)
+
+    class Meta:
+        unique_together = ('user', 'project')

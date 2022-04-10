@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
+from project_SoftDesk.tools import check_type, expected_values
 
 
 from tickets_app.models import Project, Issue
@@ -27,17 +29,32 @@ class UserSerializer(ModelSerializer):
             'contributing': {'read_only': True},
         }
 
+    def validate(self, data):
+        checkers = [
+            ('username', lambda x: len(x) > 4),
+            ('first_name', lambda x: x == '' or len(x) > 1),
+            ('last_name', lambda x: x == '' or len(x) > 1),
+            ('email', lambda x: x == '' or ("@" in x and len(x) > 5)),
+
+        ]
+        if expected_values(data, *checkers):
+            return data
+        raise serializers.ValidationError('Unexpected values recieved')
+
     def create(self, validated_data):
-        user = User.objects.create_user(
-                validated_data['username'],
-                first_name=validated_data['first_name'],
-                last_name=validated_data['last_name'],
-                email=validated_data['email'],
-                )
-        user.set_password(
-                validated_data['password'])
-        user.save()
-        return user
+        try:
+            user = User.objects.create_user(
+                    username=validated_data['username'],
+                    first_name=validated_data['first_name'],
+                    last_name=validated_data['last_name'],
+                    email=validated_data['email'],
+                    )
+            user.set_password(
+                    validated_data['password'])
+            user.save()
+            return user
+        except KeyError:
+            raise serializers.ValidationError('a required field is missing')
 
 
 class ProjectSerializer(ModelSerializer):
