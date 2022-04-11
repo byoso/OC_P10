@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from project_SoftDesk.tools import check_type, expected_values
+from project_SoftDesk.tools import expected_values
 
 
 from tickets_app.models import Project, Issue
@@ -30,18 +30,26 @@ class UserSerializer(ModelSerializer):
         }
 
     def validate(self, data):
-        checkers = [
+        rules = [
             ('username', lambda x: len(x) > 4),
             ('first_name', lambda x: x == '' or len(x) > 1),
             ('last_name', lambda x: x == '' or len(x) > 1),
             ('email', lambda x: x == '' or ("@" in x and len(x) > 5)),
 
         ]
-        if expected_values(data, *checkers):
+        if expected_values(data, *rules):
             return data
         raise serializers.ValidationError('Unexpected values recieved')
 
     def create(self, validated_data):
+        """For creation, only username and password are required,
+        the other attributes are optionnal."""
+        if 'first_name' not in validated_data:
+            validated_data['first_name'] = None
+        if 'last_name' not in validated_data:
+            validated_data['last_name'] = None
+        if 'email' not in validated_data:
+            validated_data['email'] = None
         try:
             user = User.objects.create_user(
                     username=validated_data['username'],

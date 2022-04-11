@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 
 
-
 class Project(models.Model):
     TYPE_CHOICES = [
         ("FE", "FRONT-END"),
@@ -21,11 +20,8 @@ class Project(models.Model):
         related_name="contributing",
         )
 
-    def __repr__(self):
-        return f"<{self.title}>"
-
     def __str__(self):
-        return self.title
+        return f"<project {self.id}:{self.title}>"
 
 
 class Issue(models.Model):
@@ -47,11 +43,8 @@ class Issue(models.Model):
         related_name="assignee_to_issues")
     created_time = models.DateTimeField(auto_now_add=True, null=True)
 
-    def __repr__(self):
-        return f"<{self.title}>"
-
     def __str__(self):
-        return self.title
+        return f"<Issue {self.id}:{self.title}>"
 
 
 class Comment(models.Model):
@@ -63,6 +56,9 @@ class Comment(models.Model):
         'tickets_app.Issue',
         on_delete=models.CASCADE, related_name='comments')
     created_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"<Comment {self.id}: author:{self.author}>"
 
 
 class Contributor(models.Model):
@@ -77,3 +73,7 @@ class Contributor(models.Model):
 
     class Meta:
         unique_together = ('user', 'project')
+
+    def __str__(self):
+        return (f"<Contributor {self.user.id}:{self.user.username}"
+                f" on project {self.project.id}:{self.project.title}>")

@@ -15,19 +15,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
 
 from tickets_app.api_views import (
+    # UserApiView,
     ProjectsViewset,
     IssuesViewset,
     UserViewSet,
 )
 
-router = routers.SimpleRouter()
+# Explicit actions for custom routes
+signup = UserViewSet.as_view({
+    'post': 'create',
+})
+
+
+router = SimpleRouter()
 
 router.register(
     prefix='projects', viewset=ProjectsViewset, basename='projects'),
@@ -36,11 +43,13 @@ router.register('users', UserViewSet, 'users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
+    path('api/', include(router.urls)),
+    # obtain a token pair (authentication):
     path(
-        'api/token/', TokenObtainPairView.as_view(), name="token_obtain_pair"),
+        'api/login/', TokenObtainPairView.as_view(), name="login"),
     path(
         'api/token/refresh/', TokenRefreshView.as_view(),
         name="token_refresh"),
-    path('api/', include(router.urls)),
+    # custom routes to explicitely defined actions:
+    path('api/signup/', signup, name='signup'),
 ]

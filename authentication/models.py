@@ -7,3 +7,6 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=80, blank=True, null=True)
     # FK 'tickets' to tickets_app Ticket
     # FK 'projectss' to tickets_app Project
+
+    def __str__(self):
+        return f"<User {self.id}: {self.username}"

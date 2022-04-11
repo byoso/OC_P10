@@ -1,10 +1,10 @@
-"""Here are set some helpers
+"""Here are some helpers
 """
 
 
 def check_type(value, a_type):
     """Takes 2 parameters : a value and a type (bool, int or float)
-    The fonction returns a boolean.
+    check_type returns a boolean.
     check_type does NOT convert the value of the input.
     """
     if a_type == bool:
@@ -21,7 +21,8 @@ def check_type(value, a_type):
 
 
 def expected_values(data, *args):
-    """Check if a set of data given by the client is
+    """To be used in the serializers 'validate' method.
+    Check if a set of data given by the client is
     matching the expected values.
     Args:
     - data : data from a form-data (from the client)
