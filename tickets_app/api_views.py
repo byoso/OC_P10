@@ -1,23 +1,26 @@
-from rest_framework import response
-from rest_framework.views import APIView
+# from rest_framework import response
+# from rest_framework.views import APIView
 from rest_framework.viewsets import (
     ModelViewSet,
     )
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
-    IsAuthenticated,)
-from rest_framework import permissions
+    # IsAuthenticated,
+    )
+# from rest_framework import permissions
 from django.contrib.auth import get_user_model
 
-from tickets_app.models import Project, Issue
+from tickets_app.models import (
+    Project,
+    Issue,
+    Contributor)
 from tickets_app.serializers import (
     ProjectSerializer,
     IssueSerializer,
     UserSerializer,
     )
 from .permissions import (
-    IsContributor,
-    IsAuthor,
+    ProjectPermissions,
     IsHimself,
 )
 
@@ -26,7 +29,6 @@ User = get_user_model()
 
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
-    # permission_classes = (IsHimself,)
 
     def get_queryset(self):
         queryset = User.objects.all()
@@ -34,7 +36,8 @@ class UserViewSet(ModelViewSet):
 
     def get_permissions(self):
         """
-        Instantiates and returns the list of permissions that this view requires.
+        Instantiates and returns the list of permissions that this
+        view requires.
         """
         if self.action in ('destroy', 'update', 'partial_update'):
             permission_classes = [IsHimself, ]
@@ -49,14 +52,11 @@ class UserViewSet(ModelViewSet):
 class ProjectsViewset(ModelViewSet):
 
     serializer_class = ProjectSerializer
-    permission_classes = (
-        IsAuthenticatedOrReadOnly,
-        IsContributor,
-        IsAuthor,
-        )
+    permission_classes = (ProjectPermissions,)
 
     def get_queryset(self):
-        queryset = Project.objects.all()
+        user = self.request.user
+        queryset = Project.objects.filter(contributors=user)
         return queryset
 
 

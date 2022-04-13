@@ -2,9 +2,13 @@ from django.contrib.auth import get_user_model
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from project_SoftDesk.tools import expected_values
+import traceback
 
-
-from tickets_app.models import Project, Issue
+from tickets_app.models import (
+    Project,
+    Issue,
+    Contributor,
+)
 
 User = get_user_model()
 
@@ -62,6 +66,7 @@ class UserSerializer(ModelSerializer):
             user.save()
             return user
         except KeyError:
+            traceback.print_exc()
             raise serializers.ValidationError('a required field is missing')
 
 
@@ -69,7 +74,36 @@ class ProjectSerializer(ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ['id', 'title', 'author', 'description', 'issues']
+        fields = [
+            'id', 'title', 'description', 'type', 'author',
+            'contributors', 'issues']
+
+    def get_request_user(self):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+            return user
+
+    def create(self, validated_data):
+        user = self.get_request_user()
+        try:
+            project = Project.objects.create(
+                    title=validated_data['title'],
+                    description=validated_data['description'],
+                    type=validated_data['type'],
+                    author=user,
+                    )
+            contributor = Contributor()
+            contributor.user = user
+            contributor.project = project
+            contributor.save()
+            project.save()
+            return project
+        except KeyError:
+            traceback.print_exc()
+            raise serializers.ValidationError(
+                'a required field is missing')
 
 
 class IssueSerializer(ModelSerializer):
@@ -77,3 +111,10 @@ class IssueSerializer(ModelSerializer):
     class Meta:
         model = Issue
         fields = ['id', 'title', 'description', 'assignee', 'project']
+
+
+class ContributorSerializer(ModelSerializer):
+
+    class Meta:
+        model = Contributor
+        fields = ['user', 'project', 'role']

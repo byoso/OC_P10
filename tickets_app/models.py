@@ -68,8 +68,9 @@ class Contributor(models.Model):
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name='projects',
         null=True)
-    # TODO: permission (choicefield)
-    role = models.CharField(max_length=80, null=True)
+    # permission :
+    # TODO: the author could give some special permissions (choicefield)
+    role = models.CharField(max_length=80, null=True, blank=True)
 
     class Meta:
         unique_together = ('user', 'project')

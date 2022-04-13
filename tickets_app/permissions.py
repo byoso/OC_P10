@@ -11,18 +11,17 @@ class IsHimself(BasePermission):
                 return True
 
 
-class IsContributor(BasePermission):
+class ProjectPermissions(BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if view.action == 'delete':
-            return False
-        contributors = obj.contributors
-        if request.user in contributors:
+        if request.user.is_superuser:
             return True
-
-
-class IsAuthor(BasePermission):
-
-    def has_object_permission(self, request, view, obj):
-        if request.user == obj.author:
+        if view.action == 'list' and request.user.is_authenticated:
             return True
+        if view.action == 'retrieve' and request.user.is_authenticated:
+            return True
+        if view.action == 'create' and request.user.is_authenticated:
+            return True
+        if view.action == 'delete' and request.user.is_authenticated:
+            if request.user == obj.author:
+                return True

@@ -9,4 +9,4 @@ class User(AbstractUser):
     # FK 'projectss' to tickets_app Project
 
     def __str__(self):
-        return f"<User {self.id}: {self.username}"
+        return f"<User {self.id}: {self.username}>"

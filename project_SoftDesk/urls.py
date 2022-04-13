@@ -33,9 +33,8 @@ signup = UserViewSet.as_view({
     'post': 'create',
 })
 
-
+# router and ViewSets routes
 router = SimpleRouter()
-
 router.register(
     prefix='projects', viewset=ProjectsViewset, basename='projects'),
 router.register('tickets', IssuesViewset, 'tickets'),
