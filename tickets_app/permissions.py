@@ -16,6 +16,8 @@ class ProjectPermissions(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:
             return True
+        if view.action == 'update' and request.user.is_authenticated:
+            return True
         if view.action == 'list' and request.user.is_authenticated:
             return True
         if view.action == 'retrieve' and request.user.is_authenticated:

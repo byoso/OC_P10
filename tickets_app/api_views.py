@@ -56,7 +56,7 @@ class ProjectsViewset(ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Project.objects.filter(contributors=user)
+        queryset = Project.objects.filter(contributors=user.id)
         return queryset
 
 

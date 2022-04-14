@@ -11,7 +11,7 @@ class Project(models.Model):
     ]
     title = models.CharField(max_length=80)
     description = models.CharField(max_length=255)
-    type = models.CharField(max_length=15, choices=TYPE_CHOICES)
+    type = models.CharField(max_length=4, choices=TYPE_CHOICES)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE, null=True)
@@ -62,14 +62,19 @@ class Comment(models.Model):
 
 
 class Contributor(models.Model):
+    PERMISSION_CHOICES = [
+        ("CO", "contributor"),  # can create an issue for the project
+        ("ST", "staff member"),  # perms to update a project, not delete
+        ("LE", "project leader"),  # gives full rights on a project
+    ]
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name='contributing_users', null=True)
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name='projects',
         null=True)
-    # permission :
-    # TODO: the author could give some special permissions (choicefield)
+    permission = models.CharField(
+        choices=PERMISSION_CHOICES, default="CO", max_length=4)
     role = models.CharField(max_length=80, null=True, blank=True)
 
     class Meta:

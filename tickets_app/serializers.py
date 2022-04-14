@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from project_SoftDesk.tools import expected_values
@@ -97,6 +98,7 @@ class ProjectSerializer(ModelSerializer):
             contributor = Contributor()
             contributor.user = user
             contributor.project = project
+            contributor.permission = "LE"
             contributor.save()
             project.save()
             return project
@@ -104,6 +106,23 @@ class ProjectSerializer(ModelSerializer):
             traceback.print_exc()
             raise serializers.ValidationError(
                 'a required field is missing')
+
+    def update(self, instance, validated_data):
+        user = self.get_request_user()
+        contributor = get_object_or_404(Contributor, user_id=user.id)
+        if contributor.permission == "CO":
+            raise serializers.ValidationError(
+                "You don't have the permission to do that")
+        if validated_data['title'] != '':
+            instance.title = validated_data['title']
+        if validated_data['description'] != '':
+            instance.description = validated_data['description']
+        # import pdb; pdb.set_trace()
+        for choice in instance.TYPE_CHOICES:
+            if validated_data['type'] == choice[0]:
+                instance.type = validated_data['type']
+        instance.save()
+        return instance
 
 
 class IssueSerializer(ModelSerializer):
