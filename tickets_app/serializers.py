@@ -124,6 +124,9 @@ class ProjectSerializer(ModelSerializer):
         instance.save()
         return instance
 
+    def delete(self, instance):
+        print("=== delete")
+
 
 class IssueSerializer(ModelSerializer):
 

@@ -1,4 +1,6 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission
+from .models import Contributor
 
 
 class IsHimself(BasePermission):
@@ -12,7 +14,6 @@ class IsHimself(BasePermission):
 
 
 class ProjectPermissions(BasePermission):
-
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:
             return True
@@ -24,6 +25,8 @@ class ProjectPermissions(BasePermission):
             return True
         if view.action == 'create' and request.user.is_authenticated:
             return True
-        if view.action == 'delete' and request.user.is_authenticated:
-            if request.user == obj.author:
+        if view.action == 'destroy' and request.user.is_authenticated:
+            contributor = get_object_or_404(
+                Contributor, user_id=request.user.id, project_id=obj.id)
+            if contributor.permission == "LE":
                 return True
