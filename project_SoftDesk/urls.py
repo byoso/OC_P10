@@ -26,11 +26,16 @@ from tickets_app.api_views import (
     ProjectsViewset,
     IssuesViewset,
     UserViewSet,
+    contributors,
 )
 
 # Explicit actions for custom routes
 signup = UserViewSet.as_view({
     'post': 'create',
+})
+
+get_contributors = ProjectsViewset.as_view({
+    'get': 'get_contributors',
 })
 
 # router and ViewSets routes
@@ -51,4 +56,7 @@ urlpatterns = [
         name="token_refresh"),
     # custom routes to explicitely defined actions:
     path('api/signup/', signup, name='signup'),
+    path(
+        'api/projects/<int:project_id>/users/',
+        contributors, name='get_contributors')
 ]

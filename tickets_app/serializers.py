@@ -139,4 +139,4 @@ class ContributorSerializer(ModelSerializer):
 
     class Meta:
         model = Contributor
-        fields = ['user', 'project', 'role']
+        fields = ['user', 'project', 'role', 'permission']
