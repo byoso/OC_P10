@@ -27,8 +27,8 @@ class Project(models.Model):
 class Issue(models.Model):
     title = models.CharField(max_length=80)
     description = models.CharField(max_length=255, null=True)
-    tag = models.CharField(max_length=16, null=True)
-    priority = models.CharField(max_length=16, null=True)
+    tag = models.CharField(max_length=16, null=True, blank=True)
+    priority = models.CharField(max_length=16, null=True, blank=True)
     project = models.ForeignKey(
         "tickets_app.Project",
         on_delete=models.CASCADE,

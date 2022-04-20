@@ -37,3 +37,13 @@ class ProjectPermissions(BasePermission):
                 Contributor, user_id=request.user.id, project_id=obj.id)
             if contributor.permission == "LE":
                 return True
+
+
+# class IssuePermissions(BasePermission):
+#     def has_object_permission(self, request, view, obj):
+#         if request.user.is_superuser:
+#             return True
+#         if view.action == 'create':
+#             return True
+#         if request.action == 'retrieve':
+#             return True

@@ -24,10 +24,11 @@ from rest_framework_simplejwt.views import (
 from tickets_app.api_views import (
     # UserApiView,
     ProjectsViewset,
-    IssuesViewset,
+    # IssuesViewset,
     UserViewSet,
     contributors,
     ContributorDelete,
+    GetPostIssues,
 )
 
 # Explicit actions for custom routes
@@ -43,7 +44,7 @@ get_contributors = ProjectsViewset.as_view({
 router = SimpleRouter()
 router.register(
     prefix='projects', viewset=ProjectsViewset, basename='projects'),
-router.register('tickets', IssuesViewset, 'tickets'),
+# router.register('tickets', IssuesViewset, 'tickets'),
 router.register('users', UserViewSet, 'users')
 
 urlpatterns = [
@@ -63,4 +64,8 @@ urlpatterns = [
     path(
         'api/projects/<int:project_id>/users/<int:user_id>/',
         ContributorDelete.as_view(), name='contributor_delete'),
+    path(
+        'api/projects/<int:project_id>/issues/',
+        GetPostIssues.as_view(), name="get_post_issues"
+    ),
 ]

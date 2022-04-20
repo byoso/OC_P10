@@ -1,21 +1,19 @@
-# from rest_framework import response
-# from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import NotAuthenticated, ValidationError
+from rest_framework.exceptions import (
+    NotAuthenticated,
+    ValidationError,
+    PermissionDenied)
 from django.db.utils import IntegrityError
-from rest_framework.reverse import reverse
 
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
     IsAuthenticated,
     )
-# from rest_framework import permissions
 from django.contrib.auth import get_user_model
-from rest_framework.decorators import action
 
 from tickets_app.models import (
     Project,
@@ -83,7 +81,7 @@ def contributors(request, project_id=None):
         # check if the asker is himself contributing to the project
         if not Contributor.objects.filter(
                 user_id=request.user.id, project_id=project_id).exists():
-            raise ValidationError("You are not a contributor to this project")
+            raise PermissionDenied("You are not a contributor to this project")
         # get the datas from form
         user_id = request.POST.get('user_id')
         user = get_object_or_404(User, id=user_id)
@@ -97,10 +95,10 @@ def contributors(request, project_id=None):
             raise ValidationError(
                 "Wrong permission value")
         if asker_contributor.permission == 'CO':
-            raise ValidationError(
+            raise PermissionDenied(
                 "Your permission level doesn't allow you to add contributors")
         if asker_contributor.permission == 'ST' and permission == 'LE':
-            raise ValidationError(
+            raise PermissionDenied(
                 "You can not allow such a high permission")
         try:
             contributor = Contributor.objects.create(
@@ -131,16 +129,40 @@ class ContributorDelete(APIView):
             user_contributor.delete()
             return Response("Contributor successfully deleted")
         else:
-            raise ValidationError("Your contribution level is too low")
+            raise PermissionDenied("Your contribution level is too low")
 
 
-class IssuesViewset(ModelViewSet):
+class GetPostIssues(APIView):
+    permisson_classes = [IsAuthenticated]
 
-    serializer_class = IssueSerializer
+    def get(self, request, project_id=None):
+        request.user.is_contributor_or_denied(project_id)
+        issues = IssueSerializer(Issue.objects.all(), many=True).data
+        return Response(issues)
 
-    def get_queryset(self):
-        queryset = Issue.objects.all()
-        project_id = self.request.GET.get('project_id')
-        if project_id is not None:
-            queryset = queryset.filter(project_id=project_id)
-        return queryset
+    def post(self, request, project_id=None):
+        request.user.is_contributor_or_denied(project_id)
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        tag = request.POST.get('tag')
+        priority = request.POST.get('priority')
+        project = get_object_or_404(Project, id=project_id)
+        author = request.user
+        assignee_id = request.POST.get('assignee_id')
+        if assignee_id != '' and assignee_id is not None:
+            assignee = get_object_or_404(User, id=assignee_id)
+            if not assignee.is_contributor(project_id):
+                raise ValidationError("the assignee is not a contributor")
+        else:
+            assignee = None
+
+        Issue.objects.create(
+            title=title,
+            description=description,
+            tag=tag,
+            priority=priority,
+            project=project,
+            author=author,
+            assignee=assignee,
+        )
+        return Response("Issue successfully created")
