@@ -27,6 +27,7 @@ from tickets_app.api_views import (
     IssuesViewset,
     UserViewSet,
     contributors,
+    ContributorDelete,
 )
 
 # Explicit actions for custom routes
@@ -58,5 +59,8 @@ urlpatterns = [
     path('api/signup/', signup, name='signup'),
     path(
         'api/projects/<int:project_id>/users/',
-        contributors, name='get_contributors')
+        contributors, name='contributors'),
+    path(
+        'api/projects/<int:project_id>/users/<int:user_id>/',
+        ContributorDelete.as_view(), name='contributor_delete'),
 ]

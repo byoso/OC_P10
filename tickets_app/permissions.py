@@ -3,6 +3,13 @@ from rest_framework.permissions import BasePermission
 from .models import Contributor
 
 
+CONTRIB_LEVEL = {
+    'CO': 1,
+    'ST': 2,
+    'LE': 3
+}
+
+
 class IsHimself(BasePermission):
 
     def has_object_permission(self, request, view, obj):

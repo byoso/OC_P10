@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
-    # IsAuthenticated,
+    IsAuthenticated,
     )
 # from rest_framework import permissions
 from django.contrib.auth import get_user_model
@@ -29,6 +29,7 @@ from tickets_app.serializers import (
     ContributorSerializer,
     )
 from .permissions import (
+    CONTRIB_LEVEL,
     ProjectPermissions,
     IsHimself,
 )
@@ -79,16 +80,19 @@ def contributors(request, project_id=None):
         return Response(serializer.data)
     if request.method == 'POST':
         project = get_object_or_404(Project, id=project_id)
+        # check if the asker is himself contributing to the project
         if not Contributor.objects.filter(
                 user_id=request.user.id, project_id=project_id).exists():
             raise ValidationError("You are not a contributor to this project")
+        # get the datas from form
         user_id = request.POST.get('user_id')
         user = get_object_or_404(User, id=user_id)
         role = request.POST.get('role')
         permission = request.POST.get('permission')
+
+        # permission attribution depends on the asker's own permission:
         asker_contributor = get_object_or_404(
             Contributor, user_id=request.user.id, project_id=project_id)
-        # permission attribution depends on the asker own permission
         if permission not in ('CO', 'ST', 'LE'):
             raise ValidationError(
                 "Wrong permission value")
@@ -104,10 +108,30 @@ def contributors(request, project_id=None):
                 project_id=project_id,
                 role=role,
                 permission=permission)
-        except IntegrityError:
-            raise ValidationError("This user is already contributing to the project")
-        serializer = ContributorSerializer(contributor)
-        return Response(serializer.data)
+        except IntegrityError:  # contributor already exists
+            raise ValidationError(
+                "This user is already contributing to the project")
+        data = ContributorSerializer(contributor).data
+        return Response(data)
+
+
+class ContributorDelete(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, project_id, user_id):
+        asker = request.user
+        asker_contributor = get_object_or_404(
+            Contributor, user_id=asker.id, project_id=project_id)
+        user_contributor = get_object_or_404(
+            Contributor, user_id=user_id, project_id=project_id)
+        # asker of deletion must have higher contribution permission
+        # level to be allowed to delete the asked contributor
+        if CONTRIB_LEVEL[asker_contributor.permission] > \
+                CONTRIB_LEVEL[user_contributor.permission]:
+            user_contributor.delete()
+            return Response("Contributor successfully deleted")
+        else:
+            raise ValidationError("Your contribution level is too low")
 
 
 class IssuesViewset(ModelViewSet):
