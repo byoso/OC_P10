@@ -166,3 +166,32 @@ class GetPostIssues(APIView):
             assignee=assignee,
         )
         return Response("Issue successfully created")
+
+
+class UpdateDeleteIssues(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, project_id, issue_id):
+        request.user.is_issue_author_or_denied(issue_id)
+        issue = get_object_or_404(Issue, id=issue_id)
+        issue.title = request.POST.get('title')
+        issue.description = request.POST.get('description')
+        issue.tag = request.POST.get('tag')
+        issue.priority = request.POST.get('priority')
+        assignee_id = request.POST.get('assignee_id')
+        if assignee_id != '' and assignee_id is not None:
+            assignee = get_object_or_404(User, id=assignee_id)
+            if not assignee.is_contributor(project_id):
+                raise ValidationError("the assignee is not a contributor")
+            issue.assignee_id = request.POST.get('assignee_id')
+        else:
+            assignee = None
+        issue.save()
+        return Response("Issue successfully updated")
+
+    def delete(self, request, project_id, issue_id):
+        request.user.is_issue_author_or_denied(issue_id)
+        issue = get_object_or_404(Issue, id=issue_id)
+        issue.delete()
+        return Response("Issue successfully deleted")

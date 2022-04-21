@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from tickets_app.models import Contributor
+from tickets_app.models import Contributor, Issue, Comment
 from rest_framework.exceptions import PermissionDenied
 
 
@@ -21,7 +21,16 @@ class User(AbstractUser):
         """Check if user is a contributor to a project"""
         if not self.is_contributor(project_id):
             raise PermissionDenied(
-                "you are not contributing to this project")
+                "You are not contributing to this project")
+
+    def is_issue_author(self, issue_id) -> bool:
+        return Issue.objects.filter(id=issue_id, author=self).exists()
+
+    def is_issue_author_or_denied(self, issue_id):
+        if not self.is_issue_author(issue_id):
+            raise PermissionDenied(
+                "You are not the author of this issue."
+            )
 
     def get_contributor(self, project_id):
         contributor = Contributor.objects.filter(

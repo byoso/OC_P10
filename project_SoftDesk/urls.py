@@ -29,6 +29,7 @@ from tickets_app.api_views import (
     contributors,
     ContributorDelete,
     GetPostIssues,
+    UpdateDeleteIssues,
 )
 
 # Explicit actions for custom routes
@@ -68,4 +69,8 @@ urlpatterns = [
         'api/projects/<int:project_id>/issues/',
         GetPostIssues.as_view(), name="get_post_issues"
     ),
+    path(
+        'api/projects/<int:project_id>/issues/<int:issue_id>',
+        UpdateDeleteIssues.as_view(), name="update_delete_issues"
+    )
 ]

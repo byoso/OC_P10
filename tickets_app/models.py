@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 
 class Project(models.Model):
@@ -45,6 +46,13 @@ class Issue(models.Model):
 
     def __str__(self):
         return f"<Issue {self.id}:{self.title}>"
+
+    # def is_in_project(self, project_id) -> bool:
+    #     project = get_object_or_404(Project, id=project_id)
+    #     return Issue.objects.filter(project=project, id=self.id).exists()
+
+    # def is_in_project_or_denied(self, project_id):
+    #     pass
 
 
 class Comment(models.Model):
