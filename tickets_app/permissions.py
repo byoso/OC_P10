@@ -47,3 +47,14 @@ class ProjectPermissions(BasePermission):
 #             return True
 #         if request.action == 'retrieve':
 #             return True
+
+
+class CommentPermissions(BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
+        if view.action in ['update', 'destroy']:
+            pass
+        if view.action == 'retrieve':
+            pass

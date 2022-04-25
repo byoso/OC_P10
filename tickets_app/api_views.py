@@ -19,17 +19,20 @@ from tickets_app.models import (
     Project,
     Issue,
     Contributor,
+    Comment,
     )
 from tickets_app.serializers import (
     ProjectSerializer,
     IssueSerializer,
     UserSerializer,
     ContributorSerializer,
+    CommentSerializer,
     )
 from .permissions import (
     CONTRIB_LEVEL,
     ProjectPermissions,
     IsHimself,
+    CommentPermissions,
 )
 
 User = get_user_model()
@@ -175,6 +178,7 @@ class UpdateDeleteIssues(APIView):
     def put(self, request, project_id, issue_id):
         request.user.is_issue_author_or_denied(issue_id)
         issue = get_object_or_404(Issue, id=issue_id)
+        issue.is_in_project_or_denied(project_id)
         issue.title = request.POST.get('title')
         issue.description = request.POST.get('description')
         issue.tag = request.POST.get('tag')
@@ -191,7 +195,29 @@ class UpdateDeleteIssues(APIView):
         return Response("Issue successfully updated")
 
     def delete(self, request, project_id, issue_id):
-        request.user.is_issue_author_or_denied(issue_id)
         issue = get_object_or_404(Issue, id=issue_id)
+        issue.is_in_project_or_denied(project_id)
+        request.user.is_issue_author_or_denied(issue_id)
         issue.delete()
         return Response("Issue successfully deleted")
+
+    def get(self, request, project_id, issue_id):
+        request.user.is_contributor_or_denied(project_id)
+        issue = get_object_or_404(Issue, id=issue_id)
+        issue.is_in_project_or_denied(project_id)
+        data = IssueSerializer(get_object_or_404(Issue, id=issue_id)).data
+        return Response(data)
+
+
+class CommentListCreate(APIView):
+
+    permission_classes = [IsAuthenticated, CommentPermissions]
+
+    # def post(self, request, project_id, issue_id):
+    #     pass
+
+    def get(self, request, project_id, issue_id):
+        request.user.is_contributor_or_denied(project_id)
+        comments = Comment.objects.filter(issue_id=issue_id)
+        data = CommentSerializer(comments, many=True).data
+        return Response(data)

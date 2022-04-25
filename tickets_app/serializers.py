@@ -9,6 +9,7 @@ from tickets_app.models import (
     Project,
     Issue,
     Contributor,
+    Comment,
 )
 
 User = get_user_model()
@@ -141,4 +142,10 @@ class ContributorSerializer(ModelSerializer):
 
     class Meta:
         model = Contributor
-        fields = ['user', 'project', 'role', 'permission']
+        fields = ['id', 'user', 'project', 'role', 'permission']
+
+
+class CommentSerializer(ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'description', 'author', 'issue']
