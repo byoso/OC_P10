@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission
 from .models import Contributor
+from project_SoftDesk.tools import get_params_from_request
+from .models import Issue
 
 
 CONTRIB_LEVEL = {
@@ -39,22 +41,16 @@ class ProjectPermissions(BasePermission):
                 return True
 
 
-# class IssuePermissions(BasePermission):
-#     def has_object_permission(self, request, view, obj):
-#         if request.user.is_superuser:
-#             return True
-#         if view.action == 'create':
-#             return True
-#         if request.action == 'retrieve':
-#             return True
-
-
 class CommentPermissions(BasePermission):
 
+    def has_permission(self, request, view):
+        params = get_params_from_request(request)
+        request.user.is_contributor_or_denied(params[0])
+        issue = get_object_or_404(Issue, id=params[1])
+        issue.is_in_project_or_denied(params[0])
+        return True
+
     def has_object_permission(self, request, view, obj):
-        if request.user.is_superuser:
+        if obj.author == request.user:
             return True
-        if view.action in ['update', 'destroy']:
-            pass
-        if view.action == 'retrieve':
-            pass
+        return False

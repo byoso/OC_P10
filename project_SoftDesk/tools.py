@@ -41,3 +41,16 @@ def expected_values(data, *args):
                 valid *= arg[1](data[arg[0]])
 
     return bool(valid)
+
+
+def get_params_from_path(path: str) -> list:
+    """Helper to get parameters from a path"""
+    elems = path.split("/")
+    params = [int(elem) for elem in elems if check_type(elem, int)]
+    return params
+
+
+def get_params_from_request(request) -> list:
+    """returns the parameters into a request's url"""
+    params = get_params_from_path(request.META['PATH_INFO'])
+    return params

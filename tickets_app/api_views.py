@@ -213,11 +213,38 @@ class CommentListCreate(APIView):
 
     permission_classes = [IsAuthenticated, CommentPermissions]
 
-    # def post(self, request, project_id, issue_id):
-    #     pass
-
     def get(self, request, project_id, issue_id):
-        request.user.is_contributor_or_denied(project_id)
         comments = Comment.objects.filter(issue_id=issue_id)
         data = CommentSerializer(comments, many=True).data
         return Response(data)
+
+    def post(self, request, project_id, issue_id):
+        Comment.objects.create(
+            description=request.POST.get("description"),
+            author=request.user,
+            issue_id=issue_id,
+        )
+        return Response("Comment successfully created")
+
+
+class CommentRetrieveUpdateDestroy(APIView):
+
+    permission_classes = [IsAuthenticated, CommentPermissions]
+
+    def get(elf, request, project_id, issue_id, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        data = CommentSerializer(comment).data
+        return Response(data)
+
+    def delete(self, request, project_id, issue_id, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        self.check_object_permissions(request, comment)
+        comment.delete()
+        return Response("Comment successfully deleted")
+
+    def put(self, request, project_id, issue_id, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        self.check_object_permissions(request, comment)
+        comment.description = request.POST.get("description")
+        comment.save()
+        return Response("Comment successfully updated")

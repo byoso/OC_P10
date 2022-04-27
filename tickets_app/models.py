@@ -55,7 +55,7 @@ class Issue(models.Model):
     def is_in_project_or_denied(self, project_id):
         if not self.is_in_project(project_id):
             raise ValidationError(
-                "Project and issue does not match"
+                "Project and issue do not match"
             )
 
 
