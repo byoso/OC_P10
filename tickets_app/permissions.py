@@ -27,6 +27,10 @@ class ProjectPermissions(BasePermission):
         if request.user.is_superuser:
             return True
         if view.action == 'update' and request.user.is_authenticated:
+            contributor = get_object_or_404(
+                Contributor, user_id=request.user.id, project_id=obj.id)
+            if contributor.permission in ["ST", "LE"]:
+                return True
             return True
         if view.action == 'list' and request.user.is_authenticated:
             return True

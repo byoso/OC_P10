@@ -54,7 +54,7 @@ class UserViewSet(ModelViewSet):
             permission_classes = [IsHimself, ]
         else:
             if self.action in ('list', 'retrieve',):
-                permission_classes = [IsAuthenticatedOrReadOnly, ]
+                permission_classes = [IsAuthenticated, ]
             else:
                 permission_classes = []
         return [permission() for permission in permission_classes]
@@ -76,6 +76,10 @@ def contributors(request, project_id=None):
     if not request.user.is_authenticated:
         return NotAuthenticated
     if request.method == 'GET':
+        # check if the asker is himself contributing to the project
+        if not Contributor.objects.filter(
+                user_id=request.user.id, project_id=project_id).exists():
+            raise PermissionDenied("You are not a contributor to this project")
         project = get_object_or_404(Project, id=project_id)
         serializer = UserSerializer(project.contributors, many=True)
         return Response(serializer.data)
