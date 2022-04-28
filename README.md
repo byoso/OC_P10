@@ -23,3 +23,7 @@ Install the dependencies:
 ```
 $ pip install -r requirements.txt
 ```
+
+### Documentation
+Available here:
+https://documenter.getpostman.com/view/3751803/UyrEhupD
