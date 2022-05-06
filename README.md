@@ -24,6 +24,12 @@ Install the dependencies:
 $ pip install -r requirements.txt
 ```
 
+### run the server
+
+```
+$ ./manage.py runserver
+```
+
 ### Documentation
 Available here:
 https://documenter.getpostman.com/view/3751803/UyrEhupD
