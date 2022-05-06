@@ -1,8 +1,9 @@
 ![logo soft desk](https://user.oc-static.com/upload/2020/09/22/16007803099977_P8%20%281%29.png)
 
-# Installation
 
 *Soft Desk is an api built with django rest framework. Its purpose is to manage and share issues toward each team of some projects.*
+
+# Installation
 
 ### Download or clone the project files
 (from github)
